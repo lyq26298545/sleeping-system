@@ -1,0 +1,38 @@
+.container{
+  padding: 30rpx;
+  background: #f5f7fa;
+  min-height: 100vh;
+}
+.title{
+  font-size: 44rpx;
+  font-weight: bold;
+  text-align: center;
+  margin: 20rpx 0 40rpx;
+}
+.card{
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+.score{
+  font-size: 36rpx;
+  color: #e63946;
+  font-weight: bold;
+}
+.level{
+  font-size: 30rpx;
+  color: #1d4ed8;
+  margin: 10rpx 0;
+}
+.tip{
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+}
+.empty{
+  text-align: center;
+  padding: 100rpx 0;
+  color: #999;
+  font-size: 30rpx;
+}

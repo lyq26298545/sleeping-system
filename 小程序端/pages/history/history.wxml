@@ -1,0 +1,13 @@
+<view class="container">
+  <view class="title">睡眠预测历史记录</view>
+
+  <view wx:if="{{list.length==0}}" class="empty">
+    暂无预测记录
+  </view>
+
+  <view wx:for="{{list}}" wx:key="index" class="card">
+    <view class="score">评分：{{item.sleep_score}} 分</view>
+    <view class="level">等级：{{item.sleep_level}}</view>
+    <view class="tip">{{item.advice}}</view>
+  </view>
+</view>

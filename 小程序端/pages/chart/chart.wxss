@@ -1,0 +1,11 @@
+.container{
+  padding: 30rpx;
+  background: white;
+  min-height: 100vh;
+}
+.title{
+  font-size: 44rpx;
+  font-weight: bold;
+  text-align: center;
+  margin: 20rpx 0 40rpx;
+}

@@ -1,0 +1,15 @@
+<view class="container">
+  <view class="title">近7天睡眠趋势分析</view>
+  
+  <view wx:if="{{!hasData}}" class="empty">
+    暂无睡眠预测记录，请先去首页预测
+  </view>
+
+  <ec-canvas 
+    wx:if="{{hasData}}"
+    id="mychart-dom-line" 
+    canvas-id="mychart-line" 
+    ec="{{ ec }}"
+    style="width:100%;height:400rpx;"
+  ></ec-canvas>
+</view>

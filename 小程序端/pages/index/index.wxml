@@ -1,0 +1,43 @@
+<!--index.wxml-->
+<view class="container">
+  <view class="title">睡眠质量智能预测</view>
+  
+  <view class="form-item">
+    <view class="label">每日睡眠时长（小时）</view>
+    <input type="digit" placeholder="请输入6.1~8.9" bindinput="sleep_duration" />
+  </view>
+
+  <view class="form-item">
+    <view class="label">每日身体活动量</view>
+    <input type="number" placeholder="30~75" bindinput="physical_activity" />
+  </view>
+
+  <view class="form-item">
+    <view class="label">自身压力等级（1~10）</view>
+    <input type="number" placeholder="1~10" bindinput="stress_level" />
+  </view>
+
+  <view class="form-item">
+    <view class="label">静息心率</view>
+    <input type="number" placeholder="60~85" bindinput="heart_rate" />
+  </view>
+
+  <view class="form-item">
+    <view class="label">每日行走步数</view>
+    <input type="number" placeholder="3000~10000" bindinput="daily_steps" />
+  </view>
+
+  <button class="btn" bindtap="getPredict">一键预测睡眠质量</button>
+
+  <!-- 预测结果展示 -->
+  <view wx:if="{{showResult}}" class="result-card">
+    <view class="res-title">你的睡眠评分：{{sleep_score}} 分</view>
+    <view class="res-level">睡眠等级：{{sleep_level}}</view>
+    <view class="res-tip">💡 改善建议：{{advice}}</view>
+  </view>
+
+  <!-- 合规免责声明 -->
+  <view class="disclaimer">
+    本小程序仅基于作息大数据做行为分析，非医疗诊断，不替代医院诊疗
+  </view>
+</view>

@@ -1,0 +1,25 @@
+{
+  "usingComponents": {
+    "ec-canvas": "/ec-canvas/ec-canvas"
+  },
+  "pages": [
+    "pages/index/index",
+    "pages/history/history",
+    "pages/chart/chart",
+    "pages/mine/mine"
+  ],
+  "tabBar": {
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+    
+      {
+        "pagePath": "pages/mine/mine",
+        "text": "我的"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json"
+}

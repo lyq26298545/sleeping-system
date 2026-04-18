@@ -1,0 +1,25 @@
+.container{
+  padding: 30rpx;
+  background: #f5f7fa;
+  min-height: 100vh;
+}
+.user{
+  font-size: 50rpx;
+  font-weight: bold;
+  text-align: center;
+  margin: 40rpx 0;
+}
+.item{
+  background: #fff;
+  padding: 30rpx;
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+  font-size: 32rpx;
+}
+.disclaimer{
+  margin-top: 60rpx;
+  font-size: 24rpx;
+  color: #999;
+  text-align: center;
+  line-height: 1.6;
+}

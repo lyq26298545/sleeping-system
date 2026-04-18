@@ -1,6 +1,6 @@
 .container{
   padding: 30rpx;
-  background: white;
+  background: #f5f7fa;
   min-height: 100vh;
 }
 .title{

@@ -1,63 +1,45 @@
-.container{
-  padding: 30rpx;
-  background: #f5f7fa;
-  min-height: 100vh;
-}
-.title{
-  font-size: 48rpx;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 60rpx;
-  color: #2c3e50;
-}
-.form-item{
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 30rpx;
-  margin-bottom: 20rpx;
-}
-.label{
-  font-size: 32rpx;
-  color: #333;
-  margin-bottom: 15rpx;
-}
-input{
-  border: 1rpx solid #eee;
-  border-radius: 8rpx;
-  padding: 20rpx;
-  font-size: 30rpx;
-}
-.btn{
-  margin-top: 40rpx;
-  background: #409eff;
-  color: #fff;
-}
-.result-card{
-  margin-top: 40rpx;
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 30rpx;
-}
-.res-title{
-  font-size: 40rpx;
-  font-weight: bold;
-  color: #e63946;
-  margin-bottom: 20rpx;
-}
-.res-level{
-  font-size: 36rpx;
-  color: #1d4ed8;
-  margin-bottom: 20rpx;
-}
-.res-tip{
+page { background: #f0f2f5; padding: 30rpx; box-sizing: border-box; }
+
+.header-section { margin-bottom: 40rpx; }
+.user-status { display: flex; align-items: center; font-size: 24rpx; color: #8c8c8c; margin-bottom: 10rpx; }
+.status-dot { width: 12rpx; height: 12rpx; background: #52c41a; border-radius: 50%; margin-right: 10rpx; }
+.reset-btn { margin-left: auto; color: #1890ff; }
+.page-title { font-size: 44rpx; font-weight: bold; color: #262626; }
+
+.main-card { background: #ffffff; padding: 35rpx; border-radius: 24rpx; box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.05); }
+.group-title { font-size: 28rpx; font-weight: bold; color: #595959; margin-bottom: 25rpx; }
+
+.input-row { display: flex; gap: 20rpx; }
+.field { flex: 1; }
+.label { font-size: 22rpx; color: #8c8c8c; margin-bottom: 12rpx; display: block; }
+
+/* 核心：确保 input 易于点击 */
+.input-element {
+  width: 100%;
+  height: 84rpx;
+  background: #fafafa;
+  border: 1rpx solid #d9d9d9;
+  border-radius: 12rpx;
+  padding: 0 20rpx;
   font-size: 28rpx;
-  color: #666;
-  line-height: 1.6;
+  box-sizing: border-box;
 }
-.disclaimer{
-  margin-top: 60rpx;
-  font-size: 22rpx;
-  color: #999;
-  text-align: center;
-  line-height: 1.5;
-}
+
+/* 性别页签 */
+.gender-tab { display: flex; height: 84rpx; background: #f5f5f5; border-radius: 12rpx; padding: 6rpx; box-sizing: border-box; }
+.tab-item { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 26rpx; color: #595959; }
+.tab-item.active { background: #ffffff; color: #1890ff; font-weight: bold; border-radius: 8rpx; box-shadow: 0 2rpx 6rpx rgba(0,0,0,0.1); }
+
+/* 目标按钮 */
+.target-grid { display: flex; gap: 15rpx; }
+.target-btn { flex: 1; height: 74rpx; border: 1rpx solid #d9d9d9; border-radius: 12rpx; display: flex; align-items: center; justify-content: center; font-size: 24rpx; color: #595959; }
+.target-btn.active { border-color: #1890ff; background: #e6f7ff; color: #1890ff; }
+
+.submit-button { margin-top: 50rpx; background: #1890ff; color: #fff; border-radius: 12rpx; font-size: 32rpx; height: 94rpx; line-height: 94rpx; }
+
+/* 诊断结果 */
+.result-area { margin-top: 30rpx; background: #f6ffed; border: 1rpx solid #b7eb8f; padding: 30rpx; border-radius: 16rpx; }
+.result-area.warn { background: #fff2f0; border-color: #ffccc7; }
+.res-title { font-weight: bold; font-size: 32rpx; color: #262626; margin-bottom: 10rpx; }
+.res-sub { font-size: 24rpx; color: #8c8c8c; margin-bottom: 15rpx; }
+.res-text { font-size: 28rpx; color: #595959; line-height: 1.6; }

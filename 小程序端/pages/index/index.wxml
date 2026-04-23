@@ -1,43 +1,69 @@
-<!--index.wxml-->
 <view class="container">
-  <view class="title">睡眠质量智能预测</view>
-  
-  <view class="form-item">
-    <view class="label">每日睡眠时长（小时）</view>
-    <input type="digit" placeholder="请输入6.1~8.9" bindinput="sleep_duration" />
+  <view class="header-section">
+    <view class="user-status" wx:if="{{hasUserInfo}}">
+      <view class="status-dot"></view>
+      <text>健康档案已激活</text>
+      <view class="reset-btn" bindtap="clearProfile">重置</view>
+    </view>
+    <view class="page-title">{{hasUserInfo ? '健康数据打卡' : '新用户档案登记'}}</view>
   </view>
 
-  <view class="form-item">
-    <view class="label">每日身体活动量</view>
-    <input type="number" placeholder="30~75" bindinput="physical_activity" />
+  <view class="main-card" wx:if="{{!hasUserInfo}}">
+    <view class="group-title">基本信息</view>
+    
+    <view class="input-row">
+      <view class="field">
+        <text class="label">年龄 (0-100)</text>
+        <input class="input-element" type="number" placeholder="请输入" bindinput="inputChange" data-key="temp_age" />
+      </view>
+      <view class="field">
+        <text class="label">性别</text>
+        <view class="gender-tab">
+          <view class="tab-item {{temp_gender==1?'active':''}}" bindtap="choseGender" data-val="1">男</view>
+          <view class="tab-item {{temp_gender==0?'active':''}}" bindtap="choseGender" data-val="0">女</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="input-row" style="margin-top:30rpx;">
+      <view class="field">
+        <text class="label">身高 (cm)</text>
+        <input class="input-element" type="digit" placeholder="最大240" bindinput="inputChange" data-key="temp_height" />
+      </view>
+      <view class="field">
+        <text class="label">体重 (kg)</text>
+        <input class="input-element" type="digit" placeholder="最大200" bindinput="inputChange" data-key="temp_weight" />
+      </view>
+    </view>
+
+    <view class="group-title" style="margin-top:40rpx;">运动目标</view>
+    <view class="target-grid">
+      <view class="target-btn {{temp_intention=='减肥'?'active':''}}" bindtap="choseIntention" data-val="减肥">减肥</view>
+      <view class="target-btn {{temp_intention=='锻炼'?'active':''}}" bindtap="choseIntention" data-val="锻炼">锻炼</view>
+      <view class="target-btn {{temp_intention=='维持健康'?'active':''}}" bindtap="choseIntention" data-val="维持健康">健康</view>
+    </view>
+
+    <button class="submit-button" bindtap="saveProfile">创建我的档案</button>
   </view>
 
-  <view class="form-item">
-    <view class="label">自身压力等级（1~10）</view>
-    <input type="number" placeholder="1~10" bindinput="stress_level" />
+  <view class="main-card" wx:else>
+    <view class="group-title">今日实时指标</view>
+    <view class="input-row">
+      <view class="field">
+        <text class="label">昨日睡眠 (h)</text>
+        <input class="input-element" type="digit" placeholder="输入小时数" bindinput="inputChange" data-key="sleep_duration" />
+      </view>
+      <view class="field">
+        <text class="label">当前心率 (bpm)</text>
+        <input class="input-element" type="number" placeholder="静息心率" bindinput="inputChange" data-key="heart_rate" />
+      </view>
+    </view>
+    <button class="submit-button" bindtap="onSubmit">提交 AI 诊断</button>
   </view>
 
-  <view class="form-item">
-    <view class="label">静息心率</view>
-    <input type="number" placeholder="60~85" bindinput="heart_rate" />
-  </view>
-
-  <view class="form-item">
-    <view class="label">每日行走步数</view>
-    <input type="number" placeholder="3000~10000" bindinput="daily_steps" />
-  </view>
-
-  <button class="btn" bindtap="getPredict">一键预测睡眠质量</button>
-
-  <!-- 预测结果展示 -->
-  <view wx:if="{{showResult}}" class="result-card">
-    <view class="res-title">你的睡眠评分：{{sleep_score}} 分</view>
-    <view class="res-level">睡眠等级：{{sleep_level}}</view>
-    <view class="res-tip">💡 改善建议：{{advice}}</view>
-  </view>
-
-  <!-- 合规免责声明 -->
-  <view class="disclaimer">
-    本小程序仅基于作息大数据做行为分析，非医疗诊断，不替代医院诊疗
+  <view class="result-area {{level=='⚠️ 疲劳警戒'?'warn':''}}" wx:if="{{showResult}}">
+    <view class="res-title">{{level}}</view>
+    <view class="res-sub">压力水平：{{stress_score}} | 识别状态：{{predicted_activity}}</view>
+    <view class="res-text">{{advice}}</view>
   </view>
 </view>

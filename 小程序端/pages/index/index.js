@@ -1,60 +1,76 @@
-// index.js
 Page({
   data: {
-    sleep_duration: '',
-    physical_activity: '',
-    stress_level: '',
-    heart_rate: '',
-    daily_steps: '',
+    hasUserInfo: false,
+    temp_gender: 1,
+    temp_intention: '维持健康',
+    temp_age: '', temp_height: '', temp_weight: '',
+    sleep_duration: '', heart_rate: '',
     showResult: false,
-    sleep_score: 0,
-    sleep_level: '',
-    advice: ''
+    level: '', advice: '', stress_score: 0, predicted_activity: ''
   },
 
-  // 监听输入
-  sleep_duration(e){ this.setData({sleep_duration:e.detail.value}) },
-  physical_activity(e){ this.setData({physical_activity:e.detail.value}) },
-  stress_level(e){ this.setData({stress_level:e.detail.value}) },
-  heart_rate(e){ this.setData({heart_rate:e.detail.value}) },
-  daily_steps(e){ this.setData({daily_steps:e.detail.value}) },
+  onLoad() {
+    const profile = wx.getStorageSync('user_profile');
+    if (profile) this.setData({ hasUserInfo: true });
+  },
 
-  // 调用后端模型预测
-  async getPredict(){
-    wx.showLoading({title:'正在分析中...'})
-    const that = this
+  inputChange(e) {
+    this.setData({ [e.currentTarget.dataset.key]: e.detail.value });
+  },
 
-    // 替换成你电脑局域网IP！！！PyCharm运行后本机IP
+  choseGender(e) {
+    this.setData({ temp_gender: parseInt(e.currentTarget.dataset.val) });
+  },
+
+  choseIntention(e) {
+    this.setData({ temp_intention: e.currentTarget.dataset.val });
+  },
+
+  saveProfile() {
+    const d = this.data;
+    const age = parseInt(d.temp_age);
+    const h = parseFloat(d.temp_height);
+    const w = parseFloat(d.temp_weight);
+
+    // 数值范围严格校验
+    if (isNaN(age) || age < 0 || age > 100) return this.showErr('年龄要在0-100之间');
+    if (isNaN(h) || h <= 0 || h > 240) return this.showErr('身高要在0-240cm之间');
+    if (isNaN(w) || w <= 0 || w > 200) return this.showErr('体重要在0-200kg之间');
+
+    const profile = { age, gender: d.temp_gender, height: h, weight: w, intention: d.temp_intention };
+    wx.setStorageSync('user_profile', profile);
+    this.setData({ hasUserInfo: true });
+  },
+
+  onSubmit() {
+    const profile = wx.getStorageSync('user_profile');
+    if (!this.data.sleep_duration || !this.data.heart_rate) return this.showErr('请填全今日数据');
+
+    wx.showLoading({ title: 'AI 专家诊断中' });
     wx.request({
       url: 'http://127.0.0.1:5000/predict',
       method: 'POST',
-      header: {'content-type':'application/json'},
       data: {
-        sleep_duration: that.data.sleep_duration,
-        physical_activity: that.data.physical_activity,
-        stress_level: that.data.stress_level,
-        heart_rate: that.data.heart_rate,
-        daily_steps: that.data.daily_steps
+        ...profile,
+        user_id: "1",//后面要改成真实的id
+        sleep_duration: this.data.sleep_duration,
+        sleep_quality: 7,
+        heart_rate: this.data.heart_rate,
+        steps: 5000, hr_entropy: 6.2, steps_entropy: 6.1
       },
-      success(res){
-        wx.hideLoading()
-        if(res.data.code == 200){
-          that.setData({
-            showResult: true,
-            sleep_score: res.data.sleep_score,
-            sleep_level: res.data.sleep_level,
-            advice: res.data.advice
-          })
-          // 存入本地历史记录
-          wx.setStorageSync('history', [...wx.getStorageSync('history')||[], res.data])
-        }else{
-          wx.showToast({title:'预测失败', icon:'none'})
+      success: (res) => {
+        wx.hideLoading();
+        if (res.data.code === 200) {
+          const r = res.data.data;
+          this.setData({ showResult: true, stress_score: r.stress_score, level: r.level, advice: r.advice, predicted_activity: r.predicted_activity });
         }
-      },
-      fail(){
-        wx.hideLoading()
-        wx.showToast({title:'连接服务器失败', icon:'none'})
       }
-    })
+    });
+  },
+
+  showErr(m) { wx.showToast({ title: m, icon: 'none' }); },
+  clearProfile() { 
+    wx.removeStorageSync('user_profile'); 
+    this.setData({ hasUserInfo: false, showResult: false }); 
   }
-})
+});

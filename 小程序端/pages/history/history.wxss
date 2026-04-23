@@ -10,6 +10,7 @@
   margin: 20rpx 0 40rpx;
 }
 .card{
+  width: 80%;
   background: #fff;
   border-radius: 16rpx;
   padding: 30rpx;

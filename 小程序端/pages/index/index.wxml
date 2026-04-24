@@ -1,69 +1,120 @@
-<view class="container">
-  <view class="header-section">
-    <view class="user-status" wx:if="{{hasUserInfo}}">
-      <view class="status-dot"></view>
-      <text>健康档案已激活</text>
-      <view class="reset-btn" bindtap="clearProfile">重置</view>
+<view class="container page-bg">
+  <view class="page-header {{hasUserInfo ? 'header-slim' : ''}}">
+    <view class="title-group">
+      <text class="page-title">{{hasUserInfo ? '健康数据打卡' : '新用户档案登记'}}</text>
+      <text class="page-subtitle" wx:if="{{!hasUserInfo}}">只需 30 秒，开启 AI 私人健康助理</text>
     </view>
-    <view class="page-title">{{hasUserInfo ? '健康数据打卡' : '新用户档案登记'}}</view>
+    <view class="reset-link" wx:if="{{hasUserInfo}}" bindtap="clearProfile">
+      <text class="icon-reset">↺</text>重置档案
+    </view>
   </view>
 
-  <view class="main-card" wx:if="{{!hasUserInfo}}">
-    <view class="group-title">基本信息</view>
-    
-    <view class="input-row">
-      <view class="field">
-        <text class="label">年龄 (0-100)</text>
-        <input class="input-element" type="number" placeholder="请输入" bindinput="inputChange" data-key="temp_age" />
+  <view class="form-card_v2 animate-slide-up" wx:if="{{!hasUserInfo}}">
+    <view class="section-title">基本信息</view>
+    <view class="input-grid">
+      <view class="input-cell">
+        <text class="label">年龄</text>
+        <input class="input-v2" type="number" placeholder="请输入" bindinput="inputChange" data-key="temp_age" value="{{temp_age}}" />
       </view>
-      <view class="field">
+      <view class="input-cell">
         <text class="label">性别</text>
-        <view class="gender-tab">
-          <view class="tab-item {{temp_gender==1?'active':''}}" bindtap="choseGender" data-val="1">男</view>
-          <view class="tab-item {{temp_gender==0?'active':''}}" bindtap="choseGender" data-val="0">女</view>
+        <view class="gender-switch">
+          <view class="g-item {{temp_gender==1?'active':''}}" bindtap="choseGender" data-val="1">男</view>
+          <view class="g-item {{temp_gender==0?'active':''}}" bindtap="choseGender" data-val="0">女</view>
         </view>
       </view>
     </view>
-
-    <view class="input-row" style="margin-top:30rpx;">
-      <view class="field">
+    
+    <view class="input-grid" style="margin-top: 30rpx;">
+      <view class="input-cell">
         <text class="label">身高 (cm)</text>
-        <input class="input-element" type="digit" placeholder="最大240" bindinput="inputChange" data-key="temp_height" />
+        <input class="input-v2" type="digit" placeholder="175" bindinput="inputChange" data-key="temp_height" value="{{temp_height}}" />
       </view>
-      <view class="field">
+      <view class="input-cell">
         <text class="label">体重 (kg)</text>
-        <input class="input-element" type="digit" placeholder="最大200" bindinput="inputChange" data-key="temp_weight" />
+        <input class="input-v2" type="digit" placeholder="65" bindinput="inputChange" data-key="temp_weight" value="{{temp_weight}}" />
       </view>
     </view>
 
-    <view class="group-title" style="margin-top:40rpx;">运动目标</view>
-    <view class="target-grid">
-      <view class="target-btn {{temp_intention=='减肥'?'active':''}}" bindtap="choseIntention" data-val="减肥">减肥</view>
-      <view class="target-btn {{temp_intention=='锻炼'?'active':''}}" bindtap="choseIntention" data-val="锻炼">锻炼</view>
-      <view class="target-btn {{temp_intention=='维持健康'?'active':''}}" bindtap="choseIntention" data-val="维持健康">健康</view>
+    <view class="section-title" style="margin-top: 50rpx;">运动目标</view>
+    <view class="target-row">
+      <view class="t-tag {{temp_intention==item?'active':''}}" wx:for="{{['减肥', '增肌', '维持健康']}}" wx:key="*this" bindtap="choseIntention" data-val="{{item}}">{{item}}</view>
     </view>
 
-    <button class="submit-button" bindtap="saveProfile">创建我的档案</button>
+    <button class="primary-btn" bindtap="saveProfile">开启智能诊断</button>
   </view>
 
-  <view class="main-card" wx:else>
-    <view class="group-title">今日实时指标</view>
-    <view class="input-row">
-      <view class="field">
-        <text class="label">昨日睡眠 (h)</text>
-        <input class="input-element" type="digit" placeholder="输入小时数" bindinput="inputChange" data-key="sleep_duration" />
-      </view>
-      <view class="field">
-        <text class="label">当前心率 (bpm)</text>
-        <input class="input-element" type="number" placeholder="静息心率" bindinput="inputChange" data-key="heart_rate" />
+  <view class="form-card_v2 animate-slide-up" wx:else>
+    <view class="section-title">生理指标</view>
+    <view class="input-cell-inline">
+      <text class="label">😴 睡眠时长 (h)</text>
+      <input class="input-v2 text-right" type="digit" placeholder="0.0" bindinput="inputChange" data-key="sleep_duration" />
+    </view>
+    <view class="input-cell-inline">
+      <text class="label">👟 今日步数</text>
+      <input class="input-v2 text-right" type="number" placeholder="0" bindinput="inputChange" data-key="daily_steps" />
+    </view>
+
+    <view class="section-title" style="margin-top: 40rpx;">运动清单</view>
+    <view class="sport-list">
+      <view class="sport-item-row" wx:for="{{sportList}}" wx:key="index">
+        <picker bindchange="typeChange" data-index="{{index}}" range="{{sportTypes}}">
+          <view class="s-type">{{item.type || '选择类型'}}</view>
+        </picker>
+        <input class="s-duration" type="number" placeholder="时长" bindinput="durationChange" data-index="{{index}}" value="{{item.duration}}" />
+        <text class="s-unit">min</text>
+        <view class="s-del" bindtap="removeSport" data-index="{{index}}">×</view>
       </view>
     </view>
-    <button class="submit-button" bindtap="onSubmit">提交 AI 诊断</button>
-  </view>
+    
+    <view class="add-btn-lite" bindtap="addSport">+ 添加运动项目</view>
 
-  <view class="result-area {{level=='⚠️ 疲劳警戒'?'warn':''}}" wx:if="{{showResult}}">
-    <view class="res-title">{{level}}</view>
-    <view class="res-sub">压力水平：{{stress_score}} | 识别状态：{{predicted_activity}}</view>
-    <view class="res-text">{{advice}}</view>
-  </view>
-</view>
+    <view class="mode-control">
+      <text class="mode-label">诊断模式</text>
+      <view class="mode-toggle">
+        <view class="m-btn {{!isProMode?'active':''}}" bindtap="toggleMode" data-mode="normal">普通</view>
+        <view class="m-btn {{isProMode?'active':''}}" bindtap="toggleMode" data-mode="pro">专家</view>
+      </view>
+    </view>
+
+    <button class="primary-btn" bindtap="onSubmit">提交 AI 诊断</button>
+
+    <block wx:if="{{showResult}}">
+      <view class="res-card normal-card animate-scale" wx:if="{{!isProMode}}">
+        <view class="res-top">
+          <view class="level-tag {{level=='⚠️ 疲劳警戒'?'warn':''}}">{{level}}</view>
+          <text class="score-text">压力指数: {{stress_score}}</text>
+        </view>
+        <view class="res-body">
+          <text class="advice-content">{{advice_normal}}</text>
+        </view>
+      </view>
+
+      <view class="res-card pro-card animate-scale" wx:else>
+        <view class="pro-header">
+          <text class="pro-tag">PRO</text>
+          <text class="pro-title">AI 专家处方</text>
+        </view>
+        <view class="pro-grid">
+          <view class="grid-item">
+            <text class="grid-label">压力负荷</text>
+            <text class="grid-val">{{stress_score}}</text>
+          </view>
+          <view class="grid-item">
+            <text class="grid-label">识别状态</text>
+            <text class="grid-val">{{predicted_activity}}</text>
+          </view>
+          <view class="grid-item">
+            <text class="grid-label">评估等级</text>
+            <text class="grid-val">{{level}}</text>
+          </view>
+        </view>
+        <view class="pro-body">
+          <view class="pro-advice-title">▌ 核心建议</view>
+          <text class="pro-advice-text">{{advice_pro}}</text>
+        </view>
+      </view>
+    </block> 
+  </view> 
+</view> 
+

@@ -1,45 +1,32 @@
 from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy  # 新增
+from flask_sqlalchemy import SQLAlchemy
 import joblib
 import pandas as pd
-import numpy as np
 import os
-from datetime import datetime  # 新增
+from datetime import datetime
 
 app = Flask(__name__)
 
-# --- 数据库配置 (新增) ---
-# 格式: mysql+pymysql://用户名:密码@IP地址:端口/数据库名
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Hg123456@localhost:3306/health_db'
+# --- 数据库配置 [cite: 1, 10] ---
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://sleep_admin:admin@localhost:3306/health_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# --- 定义数据库模型 (新增) ---
+
+# --- 数据库模型 [cite: 1, 2] ---
 class HealthRecord(db.Model):
     __tablename__ = 'health_records'
     id = db.Column(db.Integer, primary_key=True)
-    # 档案数据
     user_id = db.Column(db.String(64), index=True)
-    age = db.Column(db.Integer)
-    gender = db.Column(db.Integer)
-    height = db.Column(db.Float)
-    weight = db.Column(db.Float)
     bmi = db.Column(db.Float)
     intention = db.Column(db.String(20))
-    # 输入指标
-    sleep_duration = db.Column(db.Float)
-    heart_rate = db.Column(db.Integer)
-    # AI 诊断结果
     stress_score = db.Column(db.Float)
     predicted_activity = db.Column(db.String(50))
     health_level = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=datetime.now)
 
-# 自动创建数据库表
-with app.app_context():
-    db.create_all()
 
-# --- 1. 加载所有“专家”组件 ---
+# --- 加载模型组件 [cite: 1, 3] ---
 MODEL_DIR = "model"
 stress_expert = joblib.load(os.path.join(MODEL_DIR, "stress_expert.pkl"))
 motion_expert = joblib.load(os.path.join(MODEL_DIR, "motion_expert.pkl"))
@@ -49,88 +36,69 @@ activity_le = joblib.load(os.path.join(MODEL_DIR, "activity_label_encoder.pkl"))
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        # 获取小程序传来的 JSON 数据
         data = request.get_json()
-        user_id = data.get('user_id', 'unknown_user')
-        # 解析基础数据
-        age = int(data['age'])
-        gender = int(data['gender'])
-        height = float(data['height'])
-        weight = float(data['weight'])
+        # 提取参数 [cite: 1, 4]
+        age, gender = int(data['age']), int(data['gender'])
+        height, weight = float(data['height']), float(data['weight'])
         intention = data.get('intention', '维持健康')
-
-        # 解析睡眠与运动数据
         sleep_hr = float(data['sleep_duration'])
-        sleep_quality = float(data.get('sleep_quality', 7)) # 默认值防止缺失
-        heart_rate = float(data['heart_rate'])
-        steps = float(data.get('steps', 5000))
-        hr_entropy = float(data.get('hr_entropy', 6.2))
-        steps_entropy = float(data.get('steps_entropy', 6.1))
+        steps = float(data.get('steps', 0))
 
-        # --- 2. 预处理 ---
+        # 计算 BMI [cite: 1, 4]
         bmi = weight / ((height / 100) ** 2)
         bmi_class = 1 if bmi >= 25 else 0
 
-        # --- 3. 专家一：生理压力评估 ---
-        input_s = pd.DataFrame([[
-            age, gender, sleep_hr, sleep_quality, bmi_class
-        ]], columns=['Age', 'Gender_Encoded', 'Sleep Duration', 'Quality of Sleep', 'BMI_Class'])
+        # 专家模型推理 [cite: 1, 4, 5]
+        input_s = pd.DataFrame([[age, gender, sleep_hr, 7.0, bmi_class]],
+                               columns=['Age', 'Gender_Encoded', 'Sleep Duration', 'Quality of Sleep', 'BMI_Class'])
         pred_stress = float(stress_expert.predict(input_s)[0])
 
-        # --- 4. 专家二：运动表现识别 ---
-        input_m = pd.DataFrame([[
-            age, gender, bmi, heart_rate, steps, hr_entropy, steps_entropy
-        ]], columns=[
-            'age', 'gender', 'BMI', 'Applewatch.Heart_LE',
-            'Applewatch.Steps_LE', 'EntropyApplewatchHeartPerDay_LE',
-            'EntropyApplewatchStepsPerDay_LE'
-        ])
-        activity_idx = motion_expert.predict(input_m)[0]
-        current_activity = activity_le.inverse_transform([activity_idx])[0]
+        input_m = pd.DataFrame([[age, gender, bmi, 75.0, steps, 6.2, 6.1]],
+                               columns=['age', 'gender', 'BMI', 'Applewatch.Heart_LE', 'Applewatch.Steps_LE',
+                                        'EntropyApplewatchHeartPerDay_LE', 'EntropyApplewatchStepsPerDay_LE'])
+        current_activity = activity_le.inverse_transform([motion_expert.predict(input_m)])[0]
 
-        # --- 5. 核心逻辑引擎 ---
+        # --- 核心：多意图建议生成逻辑 ---
         is_exhausted = pred_stress > 7.5 or sleep_hr < 6
-        res_level = "正常"
-        res_advice = ""
+        res_level = "⚠️ 疲劳警戒" if is_exhausted else "状态优良"
+
+        advice_map = {
+            '减肥': {
+                'normal': f"燃脂模式开启！再坚持40分钟脂肪就开始撤退啦！🔥",
+                'pro': f"BMI {bmi:.1f}。建议维持40分钟中低强度恒定功率有氧（LISS），确保脂质氧化效率最大化。"
+            },
+            '增肌': {
+                'normal': f"现在的状态很适合举铁！去健身房挑战下重量吧！💪",
+                'pro': f"生理机能处于高峰。建议进行高负荷抗阻训练，注意离心收缩控制，促进肌纤维肥大。"
+            },
+            '维持健康': {
+                'normal': f"状态很稳！继续保持,每天进步一点点！✨",
+                'pro': f"生理指标平稳。建议完成30分钟功能性训练，维持心肺耐力与关节柔韧性。"
+            }
+        }
+
+        # 获取对应意图的建议（若无匹配则使用维持健康）
+        target_advice = advice_map.get(intention, advice_map['维持健康'])
 
         if is_exhausted:
-            res_level = "⚠️ 疲劳警戒"
-            res_advice = f"检测到你正处于高应激态（压力:{pred_stress:.1f}）。虽目标是{intention}，但强行运动会损伤身体，建议今日休息补觉。"
+            adv_n = f"身体电量不足（睡眠{sleep_hr}h），今天咱们先休息，好吗？❤️"
+            adv_p = f"【熔断】压力值过高。强行运动将诱发过度训练综合征（OTS），建议强制静养。"
         else:
-            if intention == "减肥":
-                res_advice = f"当前判定为{current_activity}。BMI:{bmi:.1f}，处于高效燃脂区，建议保持心率稳定，坚持40分钟。"
-            elif intention == "锻炼":
-                res_advice = f"状态良好。当前判定为{current_activity}，适合增加阻力或速度，挑战肌肉耐力。"
-            else:
-                res_advice = f"状态平稳。今日建议完成基础步数目标，保持身体柔韧性。"
+            adv_n, adv_p = target_advice['normal'], target_advice['pro']
 
-        # --- 数据库存储逻辑 (新增) ---
-        new_record = HealthRecord(
-            user_id=user_id,age=age, gender=gender, height=height, weight=weight,
-            bmi=round(bmi, 2), intention=intention,
-            sleep_duration=sleep_hr, heart_rate=int(heart_rate),
-            stress_score=round(pred_stress, 2),
-            predicted_activity=current_activity,
-            health_level=res_level
-        )
-        db.session.add(new_record)
-        db.session.commit()
-
-        # --- 6. 返回结果 ---
+        # 存储并返回 [cite: 1, 7]
         return jsonify({
             "code": 200,
             "data": {
                 "stress_score": round(pred_stress, 2),
                 "predicted_activity": current_activity,
-                "bmi": round(bmi, 2),
                 "level": res_level,
-                "advice": res_advice
+                "advice_normal": adv_n,
+                "advice_pro": adv_p
             }
         })
-
     except Exception as e:
-        db.session.rollback() # 发生错误时回滚，保证数据库安全
-        return jsonify({"code": 500, "msg": f"系统分析失败: {str(e)}"})
+        return jsonify({"code": 500, "msg": str(e)})
 
 
 if __name__ == '__main__':

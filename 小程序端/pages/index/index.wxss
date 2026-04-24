@@ -1,45 +1,166 @@
-page { background: #f0f2f5; padding: 30rpx; box-sizing: border-box; }
-
-.header-section { margin-bottom: 40rpx; }
-.user-status { display: flex; align-items: center; font-size: 24rpx; color: #8c8c8c; margin-bottom: 10rpx; }
-.status-dot { width: 12rpx; height: 12rpx; background: #52c41a; border-radius: 50%; margin-right: 10rpx; }
-.reset-btn { margin-left: auto; color: #1890ff; }
-.page-title { font-size: 44rpx; font-weight: bold; color: #262626; }
-
-.main-card { background: #ffffff; padding: 35rpx; border-radius: 24rpx; box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.05); }
-.group-title { font-size: 28rpx; font-weight: bold; color: #595959; margin-bottom: 25rpx; }
-
-.input-row { display: flex; gap: 20rpx; }
-.field { flex: 1; }
-.label { font-size: 22rpx; color: #8c8c8c; margin-bottom: 12rpx; display: block; }
-
-/* 核心：确保 input 易于点击 */
-.input-element {
-  width: 100%;
-  height: 84rpx;
-  background: #fafafa;
-  border: 1rpx solid #d9d9d9;
-  border-radius: 12rpx;
-  padding: 0 20rpx;
-  font-size: 28rpx;
-  box-sizing: border-box;
+/* --- 全局基础设置 --- */
+page {
+  background-color: #f6f8fb;
+  --primary: #1890ff;
+  --success: #52c41a;
+  --warning: #faad14;
+  --danger: #ff4d4f;
+  --pro-color: #722ed1; /* 专家模式主色：丁香紫 */
 }
 
-/* 性别页签 */
-.gender-tab { display: flex; height: 84rpx; background: #f5f5f5; border-radius: 12rpx; padding: 6rpx; box-sizing: border-box; }
-.tab-item { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 26rpx; color: #595959; }
-.tab-item.active { background: #ffffff; color: #1890ff; font-weight: bold; border-radius: 8rpx; box-shadow: 0 2rpx 6rpx rgba(0,0,0,0.1); }
+.container { padding: 30rpx; padding-bottom: 60rpx; }
 
-/* 目标按钮 */
-.target-grid { display: flex; gap: 15rpx; }
-.target-btn { flex: 1; height: 74rpx; border: 1rpx solid #d9d9d9; border-radius: 12rpx; display: flex; align-items: center; justify-content: center; font-size: 24rpx; color: #595959; }
-.target-btn.active { border-color: #1890ff; background: #e6f7ff; color: #1890ff; }
+/* --- 头部样式 --- */
+.page-header { margin-bottom: 40rpx; transition: all 0.3s; }
+.header-slim { margin-bottom: 20rpx; display: flex; align-items: center; justify-content: space-between; }
+.page-title { font-size: 46rpx; font-weight: bold; color: #1f1f1f; }
+.page-subtitle { font-size: 26rpx; color: #8c8c8c; margin-top: 8rpx; display: block; }
+.reset-link { font-size: 24rpx; color: #595959; background: #fff; padding: 10rpx 20rpx; border-radius: 30rpx; box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05); }
 
-.submit-button { margin-top: 50rpx; background: #1890ff; color: #fff; border-radius: 12rpx; font-size: 32rpx; height: 94rpx; line-height: 94rpx; }
+/* --- 卡片通用样式 --- */
+.form-card_v2 {
+  background: #ffffff;
+  border-radius: 30rpx;
+  padding: 40rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 10rpx 30rpx rgba(0,0,0,0.02);
+}
 
-/* 诊断结果 */
-.result-area { margin-top: 30rpx; background: #f6ffed; border: 1rpx solid #b7eb8f; padding: 30rpx; border-radius: 16rpx; }
-.result-area.warn { background: #fff2f0; border-color: #ffccc7; }
-.res-title { font-weight: bold; font-size: 32rpx; color: #262626; margin-bottom: 10rpx; }
-.res-sub { font-size: 24rpx; color: #8c8c8c; margin-bottom: 15rpx; }
-.res-text { font-size: 28rpx; color: #595959; line-height: 1.6; }
+.section-title { font-size: 30rpx; font-weight: bold; color: #262626; margin-bottom: 30rpx; position: relative; padding-left: 20rpx; }
+.section-title::before { content: ''; position: absolute; left: 0; top: 10%; height: 80%; width: 6rpx; background: var(--primary); border-radius: 4rpx; }
+
+/* --- 输入组件 --- */
+.input-grid { display: flex; gap: 20rpx; }
+.input-cell { flex: 1; }
+.label { font-size: 24rpx; color: #8c8c8c; margin-bottom: 12rpx; display: block; }
+.input-v2 { background: #f5f5f5; height: 90rpx; border-radius: 16rpx; padding: 0 24rpx; font-size: 30rpx; color: #262626; font-weight: 500; }
+.text-right { text-align: right; }
+
+/* --- 性别/目标切换 --- */
+.gender-switch, .target-row { display: flex; gap: 16rpx; }
+.g-item, .t-tag {
+  flex: 1; height: 90rpx; background: #f5f5f5; border-radius: 16rpx;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28rpx; color: #595959; transition: all 0.2s;
+}
+.g-item.active, .t-tag.active { background: var(--primary); color: #fff; font-weight: bold; }
+
+/* --- 运动列表 (精简化) --- */
+.sport-item-row {
+  display: flex; align-items: center; background: #fafafa;
+  padding: 20rpx; border-radius: 16rpx; margin-bottom: 16rpx; border: 1rpx solid #f0f0f0;
+}
+.s-type { font-size: 28rpx; color: var(--primary); font-weight: bold; min-width: 140rpx; }
+.s-duration { flex: 1; text-align: right; font-size: 34rpx; font-weight: bold; color: #262626; padding-right: 10rpx; }
+.s-unit { font-size: 22rpx; color: #bfbfbf; }
+.s-del { font-size: 40rpx; color: var(--danger); padding-left: 30rpx; margin-right: 10rpx; }
+
+.add-btn-lite { text-align: center; font-size: 26rpx; color: var(--primary); padding: 20rpx; }
+
+/* --- 模式切换控制 --- */
+.mode-control {
+  display: flex; align-items: center; justify-content: space-between;
+  margin: 40rpx 0 20rpx; padding: 10rpx 20rpx; background: #f0f2f5; border-radius: 50rpx;
+}
+.mode-label { font-size: 26rpx; color: #8c8c8c; }
+.mode-toggle { display: flex; background: #e8e8e8; padding: 4rpx; border-radius: 40rpx; }
+.m-btn { padding: 10rpx 30rpx; font-size: 24rpx; border-radius: 36rpx; color: #8c8c8c; }
+.m-btn.active { background: #fff; color: var(--primary); font-weight: bold; box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.1); }
+
+/* --- 按钮 --- */
+.primary-btn {
+  background: var(--primary); color: #fff; height: 100rpx; line-height: 100rpx;
+  border-radius: 20rpx; font-size: 32rpx; font-weight: bold; margin-top: 30rpx;
+  box-shadow: 0 8rpx 20rpx rgba(24, 144, 255, 0.2);
+}
+
+/* --- ⚠️ 结果展示区域 (淡色系区分方案) --- */
+
+.res-card {
+  border-radius: 28rpx;
+  margin-top: 30rpx;
+  padding: 35rpx;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* 1. 普通模式：清爽天蓝 */
+.normal-card {
+  background: #f0f7ff; 
+  border: 2rpx solid #bae7ff;
+}
+.level-tag {
+  display: inline-block;
+  padding: 6rpx 18rpx;
+  border-radius: 12rpx;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 24rpx;
+}
+.level-tag.warn { background: var(--danger); }
+.score-text { float: right; font-size: 24rpx; color: #64748b; }
+.advice-content {
+  margin-top: 25rpx;
+  display: block;
+  font-size: 28rpx;
+  line-height: 1.6;
+  color: #444;
+}
+
+/* 2. 专家模式：柔和丁香紫 */
+.pro-card {
+  background: #f9f0ff; 
+  border: 2rpx solid #efdbff;
+}
+.pro-header { display: flex; align-items: center; margin-bottom: 25rpx; }
+.pro-tag {
+  background: var(--pro-color);
+  color: #fff;
+  font-size: 20rpx;
+  font-weight: bold;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  margin-right: 12rpx;
+}
+.pro-title { font-size: 30rpx; font-weight: bold; color: #531dab; }
+
+.pro-grid { display: flex; gap: 15rpx; margin-bottom: 30rpx; }
+.grid-item {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.7); 
+  padding: 15rpx;
+  border-radius: 16rpx;
+  text-align: center;
+  border: 1rpx solid #f3e8ff;
+}
+.grid-label { font-size: 20rpx; color: #8c8c8c; display: block; margin-bottom: 4rpx; }
+.grid-val { font-size: 26rpx; font-weight: bold; color: var(--pro-color); }
+
+.pro-advice-title {
+  font-size: 24rpx;
+  font-weight: bold;
+  color: var(--pro-color);
+  margin-bottom: 10rpx;
+  display: flex;
+  align-items: center;
+}
+.pro-advice-title::before {
+  content: "";
+  width: 6rpx;
+  height: 24rpx;
+  background: #b37feb;
+  margin-right: 12rpx;
+  border-radius: 4rpx;
+}
+.pro-advice-text {
+  font-size: 28rpx;
+  line-height: 1.7;
+  color: #434343;
+  display: block;
+}
+
+/* --- 动画 --- */
+.animate-slide-up { animation: slideUp 0.4s ease-out; }
+.animate-scale { animation: scaleIn 0.3s ease-out; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(30rpx); } to { opacity: 1; transform: translateY(0); } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }

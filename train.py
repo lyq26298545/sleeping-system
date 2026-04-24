@@ -72,59 +72,57 @@ print("文件列表: stress_expert.pkl, motion_expert.pkl, activity_label_encode
 
 # --- 4. 核心逻辑：意向驱动与安全熔断评价系统 ---
 
-def health_advice_system(user_data):
-    """
-    user_data = {
-        'age': 25, 'gender': 1, 'height': 175, 'weight': 70,
-        'sleep_hr': 5.5, 'sleep_quality': 4, 'intention': '减肥'
-    }
-    """
-    # 计算实时 BMI
-    bmi = user_data['weight'] / ((user_data['height'] / 100) ** 2)
-    bmi_class = 1 if bmi >= 25 else 0
-
-    # A. 压力预测
-    input_s = pd.DataFrame([[
-        user_data['age'], user_data['gender'],
-        user_data['sleep_hr'], user_data['sleep_quality'], bmi_class
-    ]], columns=['Age', 'Gender_Encoded', 'Sleep Duration', 'Quality of Sleep', 'BMI_Class'])
-
-    pred_stress = stress_model.predict(input_s)[0]
-
-    # B. 安全熔断逻辑 (针对中青年的纠正标准)
-    is_exhausted = pred_stress > 7.5 or user_data['sleep_hr'] < 6
-
-    # C. 生成差异化建议
-    goal = user_data['intention']
-    result = f"--- 智能健康报告 (目标: {goal}) ---\n"
-    result += f"预测生理压力指数: {pred_stress:.1f} / 10\n"
-
-    if is_exhausted:
-        result += "【🚨 安全熔断触发】评价：身体处于高压状态，睡眠严重不足。\n"
-        result += "建议：今日禁止高强度训练。强行运动会抑制脂肪代谢并损伤心脏，请优先补觉。"
-    else:
-        if goal == '减肥':
-            result += f"【🟢 状态优良】评价：你的 BMI 为 {bmi:.1f}，代谢窗口开启。\n"
-            result += "建议：维持 40 分钟稳态有氧（快走或慢跑），保持心率平稳。"
-        elif goal == '锻炼':
-            result += "【🔵 恢复充分】评价：肌肉募集能力处于高峰。\n"
-            result += "建议：今日适合进行抗阻力训练或高强度间歇（HIIT）。"
-        else:  # 维持健康
-            result += "【🟡 状态平稳】评价：生理基准线稳定。\n"
-            result += "建议：完成 30 分钟适度活动，保持身体柔韧性与心肺活力。"
-
-    return result
-
-
-# --- 5. 模拟测试 ---
-test_user = {
-    'age': 28,
-    'gender': 1,
-    'height': 180,
-    'weight': 85,
-    'sleep_hr': 5.5,  # 睡眠不足 6 小时
-    'sleep_quality': 4,
-    'intention': '减肥'
-}
-
-print(health_advice_system(test_user))
+# def health_advice_system(user_data):
+#     """
+#     user_data = {
+#         'age': 25, 'gender': 1, 'height': 175, 'weight': 70,
+#         'sleep_hr': 5.5, 'sleep_quality': 4, 'intention': '减肥'
+#     }
+#     """
+#     # 计算实时 BMI
+#     bmi = user_data['weight'] / ((user_data['height'] / 100) ** 2)
+#     bmi_class = 1 if bmi >= 25 else 0
+#
+#     # A. 压力预测
+#     input_s = pd.DataFrame([[
+#         user_data['age'], user_data['gender'],
+#         user_data['sleep_hr'], user_data['sleep_quality'], bmi_class
+#     ]], columns=['Age', 'Gender_Encoded', 'Sleep Duration', 'Quality of Sleep', 'BMI_Class'])
+#
+#     pred_stress = stress_model.predict(input_s)[0]
+#
+#     # B. 安全熔断逻辑 (针对中青年的纠正标准)
+#     is_exhausted = pred_stress > 7.5 or user_data['sleep_hr'] < 6
+#
+#     # C. 生成差异化建议
+#     goal = user_data['intention']
+#     result = f"--- 智能健康报告 (目标: {goal}) ---\n"
+#     result += f"预测生理压力指数: {pred_stress:.1f} / 10\n"
+#
+#     if is_exhausted:
+#         result += "【🚨 安全熔断触发】评价：身体处于高压状态，睡眠严重不足。\n"
+#         result += "建议：今日禁止高强度训练。强行运动会抑制脂肪代谢并损伤心脏，请优先补觉。"
+#     else:
+#         if goal == '减肥':
+#             result += f"【🟢 状态优良】评价：你的 BMI 为 {bmi:.1f}，代谢窗口开启。\n"
+#             result += "建议：维持 40 分钟稳态有氧（快走或慢跑），保持心率平稳。"
+#         elif goal == '锻炼':
+#             result += "【🔵 恢复充分】评价：肌肉募集能力处于高峰。\n"
+#             result += "建议：今日适合进行抗阻力训练或高强度间歇（HIIT）。"
+#         else:  # 维持健康
+#             result += "【🟡 状态平稳】评价：生理基准线稳定。\n"
+#             result += "建议：完成 30 分钟适度活动，保持身体柔韧性与心肺活力。"
+#
+#     return result
+#
+#
+# # --- 5. 模拟测试 ---
+# test_user = {
+#     'age': 28,
+#     'gender': 1,
+#     'height': 180,
+#     'weight': 85,
+#     'sleep_hr': 5.5,  # 睡眠不足 6 小时
+#     'sleep_quality': 4,
+#     'intention': '减肥'
+# }

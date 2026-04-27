@@ -1,15 +1,20 @@
 <view class="container">
-  <view class="title">近7天睡眠趋势分析</view>
-  
-  <view wx:if="{{!hasData}}" class="empty">
-    暂无睡眠预测记录，请先去首页预测
+  <view class="header">
+    <text class="title">健康趋势分析</text>
+    <text class="subtitle">最近7天及历史数据</text>
   </view>
 
-  <ec-canvas 
-    wx:if="{{hasData}}"
-    id="mychart-dom-line" 
-    canvas-id="mychart-line" 
-    ec="{{ ec }}"
-    style="width:100%;height:400rpx;"
-  ></ec-canvas>
+  <view class="chart-box" wx:if="{{hasData}}">
+    <ec-canvas id="mychart-dom-line" canvas-id="mychart-line" ec="{{ ec }}"></ec-canvas>
+  </view>
+
+  <view class="empty-holder" wx:else>
+    <!-- <image src="/images/empty_data.png" mode="aspectFit"></image> -->
+    <text>还没有足够的健康数据生成趋势图</text>
+    <button class="go-btn" bindtap="navToIndex">去打卡</button>
+  </view> 
+
+  <view class="tip-bar" wx:if="{{hasData}}">
+    <text>💡 左右滑动图表查看更多历史记录</text>
+  </view>
 </view>

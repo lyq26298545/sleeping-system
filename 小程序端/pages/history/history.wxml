@@ -1,13 +1,90 @@
 <view class="container">
-  <view class="title">睡眠预测历史记录</view>
-
-  <view wx:if="{{list.length==0}}" class="empty">
-    暂无预测记录
+  <view class="search-bar">
+    <picker mode="date" bindchange="onDateChange">
+      <view class="picker-box">
+        <text class="picker-label">按日期查看：</text>
+        <text class="picker-value">{{selectedDate || '全部记录'}}</text>
+        <text class="picker-icon">📅</text>
+      </view>
+    </picker>
+    <view class="reset-btn" wx:if="{{selectedDate}}" bindtap="resetSearch">重置</view>
   </view>
 
-  <view wx:for="{{list}}" wx:key="index" class="card">
-    <view class="score">评分：{{item.sleep_score}} 分</view>
-    <view class="level">等级：{{item.sleep_level}}</view>
-    <view class="tip">{{item.advice}}</view>
+  <scroll-view scroll-y class="history-list">
+    <view class="empty-tip" wx:if="{{list.length === 0}}">暂无相关健康打卡记录</view>
+    
+    <view class="history-card animate-fade-in" 
+          wx:for="{{list}}" wx:key="id" 
+          bindtap="showDetail" data-item="{{item}}">
+      <view class="card-left">
+        <view class="card-date">{{item.display_date}}</view>
+        <view class="card-time">{{item.time}}</view>
+      </view>
+      <view class="card-mid">
+        <view class="indicator">
+          <text class="label">睡眠</text>
+          <text class="val">{{item.sleep_duration}}h</text>
+        </view>
+        <view class="indicator">
+          <text class="label">步数</text>
+          <text class="val">{{item.steps}}</text>
+        </view>
+        <view class="indicator">
+          <text class="label">运动量</text>
+          <text class="val">{{item.activity_value}}</text>
+        </view>
+      </view>
+      <view class="card-right">
+        <view class="status-tag {{item.health_level == '状态优良' ? 'safe' : 'warn'}}">
+          {{item.health_level}}
+        </view>
+        <text class="arrow">></text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="modal-mask" wx:if="{{showModal}}" bindtap="closeModal"></view>
+  <view class="modal-content {{showModal ? 'modal-show' : ''}}" wx:if="{{showModal}}">
+    <view class="modal-header">
+      <text class="modal-title">诊断详情</text>
+      <text class="modal-close" bindtap="closeModal">×</text>
+    </view>
+    <view class="modal-body">
+      <view class="detail-row">
+        <text class="d-label">打卡时间：</text>
+        <text class="d-val">{{activeItem.date}} {{activeItem.time}}</text>
+      </view>
+      <view class="detail-grid">
+        <view class="d-grid-item">
+          <text class="d-grid-label">睡眠时长</text>
+          <text class="d-grid-val">{{activeItem.sleep_duration}}h</text>
+        </view>
+        <view class="d-grid-item">
+          <text class="d-grid-label">今日步数</text>
+          <text class="d-grid-val">{{activeItem.steps}}</text>
+        </view>
+        <view class="d-grid-item">
+          <text class="d-grid-label">压力指数</text>
+          <text class="d-grid-val">{{activeItem.stress_score}}</text>
+        </view>
+        <view class="d-grid-item">
+          <text class="d-grid-label">BMI数值</text>
+          <text class="d-grid-val">{{activeItem.bmi}}</text>
+        </view>
+        <view class="d-grid-item">
+          <text class="d-grid-label">运动量</text>
+          <text class="d-grid-val">{{activeItem.activity_value}}</text>
+        </view>
+      </view>
+      <view class="detail-row">
+        <text class="d-label">健康等级：</text>
+        <text class="d-val {{activeItem.health_level == '状态优良' ? 'text-safe' : 'text-warn'}}">{{activeItem.health_level}}</text>
+      </view>
+      <view class="detail-row">
+        <text class="d-label">识别状态：</text>
+        <text class="d-val">{{activeItem.predicted_activity}}</text>
+      </view>
+    </view>
+    <button class="modal-btn" bindtap="closeModal">我知道了</button>
   </view>
 </view>

@@ -1,26 +1,11 @@
-<view class="container">
-  <!-- 背景层（预留背景图路径） -->
-  <image class="bg-img" src="{{bgImgUrl || '/images/avatar.png'}}" mode="widthFix"></image>
-
-  <!-- 个人信息区 -->
-  <view class="user-card">
-    <!-- 头像（预留自定义路径） -->
-    <view class="avatar-wrap" bindtap="chooseAvatar">
-      <image class="avatar" src="{{avatarUrl || '/images/avatar.png'}}" mode="aspectFill"></image>
-      <view class="edit-avatar">✏️</view>
-    </view>
-    
-    <!-- 个人信息（预留编辑路径） -->
-    <view class="user-info" bindtap="editUserInfo">
-      <view class="user-name">{{userName || '请完善昵称'}}</view>
-      <view class="user-desc">{{userDesc || '点击编辑个人信息'}}</view>
-    </view>
+<view class="user-card">
+  <view class="avatar-wrap" bindtap="chooseAvatar">
+    <image class="avatar" src="{{avatarUrl}}" mode="aspectFill"></image>
+    <view class="edit-avatar">✏️</view>
   </view>
-
-
-
-  <!-- 免责声明 -->
-  <view class="disclaimer">
-    本小程序仅基于作息大数据做行为分析与建议，非医疗诊断，不替代医院诊疗
+  
+  <view class="user-info" bindtap="editUserInfo">
+    <view class="user-name">{{userName || '新用户'}}</view>
+    <view class="user-desc">{{userDesc}}</view>
   </view>
 </view>

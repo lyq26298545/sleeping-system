@@ -1,22 +1,85 @@
+// mine.js 修改后
 Page({
   data: {
-    // 预留自定义路径 - 背景图（你替换成自己的图片路径即可）
-    bgImgUrl: '/images/avatar.png', 
-    // 预留自定义路径 - 头像（默认占位，你替换成自己的默认头像路径）
-    avatarUrl: '/images/avatar.png', 
-    // 预留用户信息
-    userName: '',
-    userDesc: ''
+    bgImgUrl: '', 
+    avatarUrl: '/images/avatar.png', // 1. 明确默认头像路径
+    userName: '未登录',
+    userDesc: '点击完善个人信息',
+    openid: '' 
   },
 
-  // 预留：选择/更换头像方法（你后续对接微信头像选择API即可）
+  onShow() {
+    // 2. 页面显示时，尝试同步本地缓存的资料
+    const profile = wx.getStorageSync('user_profile');
+    if (profile) {
+      this.setData({
+        openid: profile.openid,
+        userName: profile.nickname || '健康用户',
+        // 如果缓存里有头像就用缓存的，没有就保持默认的 /images/avatar.png
+        avatarUrl: profile.avatar_url || '/images/avatar.png',
+        userDesc: `${profile.age}岁 | ${profile.height}cm | ${profile.weight}kg`
+      });
+    }
+  },
+
+  // 3. 修改头像并同步数据库
   chooseAvatar() {
-    wx.showToast({title: '暂未开放头像编辑', icon: 'none'});
-    // 后续可对接 wx.chooseAvatar 微信API
+    const that = this;
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      success: (res) => {
+        const path = res.tempFiles[0].tempFilePath;
+        
+        // 发送请求到后端更新数据库
+        wx.request({
+          url: 'http://127.0.0.1:5000/api/update_user',
+          method: 'POST',
+          data: {
+            openid: this.data.openid,
+            avatar_url: path
+          },
+          success: (resp) => {
+            if (resp.data.status === 'success') {
+              // 更新成功后，同时修改内存和缓存
+              that.setData({ avatarUrl: path });
+              const profile = wx.getStorageSync('user_profile');
+              profile.avatar_url = path;
+              wx.setStorageSync('user_profile', profile);
+              wx.showToast({ title: '头像更新成功' });
+            }
+          }
+        });
+      }
+    });
   },
 
-  // 预留：编辑个人信息方法（你后续做表单编辑即可）
+  // 4. 修改昵称弹窗
   editUserInfo() {
-    wx.showToast({title: '暂未开放信息编辑', icon: 'none'});
-  },
- })
+    wx.showModal({
+      title: '修改昵称',
+      editable: true,
+      content: this.data.userName,
+      success: (res) => {
+        if (res.confirm && res.content) {
+          wx.request({
+            url: 'http://127.0.0.1:5000/api/update_user',
+            method: 'POST',
+            data: {
+              openid: this.data.openid,
+              nickname: res.content
+            },
+            success: (resp) => {
+              if (resp.data.status === 'success') {
+                this.setData({ userName: res.content });
+                const profile = wx.getStorageSync('user_profile');
+                profile.nickname = res.content;
+                wx.setStorageSync('user_profile', profile);
+              }
+            }
+          });
+        }
+      }
+    });
+  }
+});

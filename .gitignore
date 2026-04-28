@@ -1,3 +1,5 @@
 /.idea
 /原始数据
 /log.txt
+/secure.py
+小程序端/project.private.config.json

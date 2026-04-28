@@ -9,7 +9,8 @@ from datetime import datetime
 app = Flask(__name__)
 
 # --- 1. 数据库配置 ---
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://sleep_admin:admin@localhost:3306/health_db'
+from secure import db_user, db_password
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{db_user}:{db_password}@localhost:3306/health_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -59,8 +60,8 @@ except Exception as e:
     print(f"模型加载失败，请检查 model 文件夹: {e}")
 
 # --- 4. 微信身份验证工具 ---
-WX_APPID = 'wx349d6136dd3e124b'
-WX_SECRET = '7197e9724f64e467da6818a4daceb051'
+from secure import WX_APPID, WX_SECRET
+
 
 
 def get_openid_from_weixin(code):

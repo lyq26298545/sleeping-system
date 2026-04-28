@@ -62,8 +62,6 @@ except Exception as e:
 # --- 4. 微信身份验证工具 ---
 from secure import WX_APPID, WX_SECRET
 
-
-
 def get_openid_from_weixin(code):
     """通过 code 向微信服务器换取 openid"""
     url = f"https://api.weixin.qq.com/sns/jscode2session?appid={WX_APPID}&secret={WX_SECRET}&js_code={code}&grant_type=authorization_code"
